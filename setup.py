@@ -8,7 +8,7 @@ reqs = [line.strip() for line in open('requirements.txt')]
 
 setup(
     name             = "station-simulator",
-    version          = '0.0.1',
+    version          = '0.0.2',
     description      = 'Tool for generating station CSV data',
     packages         = find_packages(),
     long_description = readme(),
