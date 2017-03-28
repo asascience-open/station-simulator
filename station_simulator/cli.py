@@ -23,7 +23,7 @@ def dateparse(date_str):
     return arrow_obj.to('utc').naive
 
 
-def generate_csv(output, station_name, start_date, end_date):
+def generate_csv(output, station_name, start_date, end_date, frequency):
     '''
     Writes a bunch of random data to output
 
@@ -31,6 +31,7 @@ def generate_csv(output, station_name, start_date, end_date):
     :param str station_name: Name of the station as it should appear in CSV file
     :param datetime start_date: Start Date
     :param datetime end_date: End Date
+    :param str frequency: Frequency of observations
     '''
     current_date = start_date
     with open(output, 'w') as csvfile:
@@ -42,7 +43,14 @@ def generate_csv(output, station_name, start_date, end_date):
             row = generate_row(station_name, current_date)
             csv_writer.writerow(row)
 
-            current_date += timedelta(hours=1)
+            if frequency == 'hour':
+                current_date += timedelta(hours=1)
+            elif frequency == 'minute':
+                current_date += timedelta(minutes=1)
+            elif frequency == 'second':
+                current_date += timedelta(seconds=1)
+            else:
+                raise ValueError("Invalid frequency %s" % frequency)
 
 
 def generate_row(station_name, date):
@@ -78,12 +86,13 @@ def main():
     parser.add_argument('-s', '--start', default='2017-01-01', help='Start Date')
     parser.add_argument('-e', '--end',
                         default=datetime.utcnow().strftime('%Y-%m-%d'), help='End Date')
+    parser.add_argument('-f', '--frequency', choices=['second', 'minute', 'hour'], default='hour')
     parser.add_argument('output', help='Output file')
     args = parser.parse_args()
 
     start_date = dateparse(args.start)
     end_date = dateparse(args.end)
-    generate_csv(args.output, args.station_name, start_date, end_date)
+    generate_csv(args.output, args.station_name, start_date, end_date, args.frequency)
     return 0
 
 
